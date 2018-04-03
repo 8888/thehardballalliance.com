@@ -86,3 +86,9 @@ app.get("/api/players/:name", function(req, res) {
         }
     }
 });
+
+// catch all other get requests to be sent index.html
+// this allows the angular router to handle paths
+app.get("/*", function(req, res) {
+    res.sendFile(distDir + '/index.html')
+});

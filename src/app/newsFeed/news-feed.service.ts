@@ -17,4 +17,10 @@ export class NewsFeedService {
         // receives this and returns it as an Observable
         return this.http.get(this.postsUrl);
     }
+
+    public submitNewPost(post: Post): void {
+        // receives a Post object
+        // send this data to the server to handle
+        console.log(post);
+    }
 }

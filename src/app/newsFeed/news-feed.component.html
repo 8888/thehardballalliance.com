@@ -6,20 +6,3 @@
     </app-news-post>
   </div>
 </div> <!-- Posts -->
-<div>
-  <form [formGroup]="newPostForm" (ngSubmit)="onSubmit()">
-    <div class="form-group">
-      <label class="center-block">Title:
-        <input class="form-control" formControlName="title">
-      </label>
-    </div>
-    <div class="form-group">
-      <label class="center-block">Body:
-        <textarea class="form-control" formControlName="body"></textarea>
-      </label>
-    </div>
-    <button type="submit" [disabled]="!newPostForm.valid" class="btn btn-success">
-      Submit New Post
-    </button>
-  </form>
-</div> <!-- Form -->
