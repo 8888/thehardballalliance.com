@@ -17,12 +17,21 @@ PLAYERS = [
     {name: "lee", number: 8},
     {name: "nora", number: 0}
 ];
+POSTS = [
+    {title: "post1", body: "Some information to display"},
+    {title: "post2", body: "Some more information to display"}
+];
 
-// Geeneric error handler
+// Generic error handler
 function handleError(res, reason, message, code) {
     console.log("Error: " + reason);
     res.status(code || 500).json({"error": message});
 }
+
+// get all posts
+app.get("/api/posts", function(req, res) {
+    res.status(200).json({posts: POSTS})
+})
 
 // get all players
 app.get("/api/players", function(req, res) {
