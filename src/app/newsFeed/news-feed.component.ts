@@ -7,8 +7,8 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
     styleUrls: ['./news-feed.component.css']
 })
 export class NewsFeedComponent {
-    private newPostForm: FormGroup;
-    private posts: Object[]; // {title: string, body: string}
+    public newPostForm: FormGroup;
+    public posts: Object[]; // {title: string, body: string}
 
     constructor(private fb: FormBuilder) {
         this.createForm();
@@ -30,7 +30,7 @@ export class NewsFeedComponent {
         return this.newPostForm.controls['body'].value;
     }
 
-    private onSubmit(): void {
+    public onSubmit(): void {
         if (this.newPostForm.valid) {
             this.posts.unshift({title: this.formTitle, body: this.formBody});
             this.newPostForm.reset();
