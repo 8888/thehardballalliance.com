@@ -1,25 +1,40 @@
-var express = require("express");
-var bodyParser = require("body-parser");
+'use strict';
 
-var app = express();
+let express = require("express");
+let bodyParser = require("body-parser");
+let { Client, Pool } = require("pg");
+
+// load .env if not in prod
+let SSL = true; // user SSL in prod, not on local host
+if (process.env.NODE_ENV !== "production") {
+    require("dotenv").load();
+    SSL = false;
+}
+
+// configure express app
+let app = express();
 app.use(bodyParser.json());
 
-var distDir = __dirname + "/dist/";
+// set where static angular generated dist files are stored
+let distDir = __dirname + "/dist/";
 app.use(express.static(distDir));
 
-var server = app.listen(process.env.PORT || 8080, function () {
-    var port = server.address().port;
+// start app
+let server = app.listen(process.env.PORT || 8080, function () {
+    let port = server.address().port;
     console.log("App now running on port ", port);
 });
 
+// connection pool for postgreSQL DB connections
+const POOL = new Pool({
+    connectionString: process.env.DATABASE_URL,
+    ssl: SSL // heroku PG requries ssl
+});
+
 // Mock DB data
-PLAYERS = [
+const PLAYERS = [
     {name: "lee", number: 8},
     {name: "nora", number: 0}
-];
-POSTS = [
-    {title: "post1", body: "Some information to display"},
-    {title: "post2", body: "Some more information to display"}
 ];
 
 // Generic error handler
@@ -30,7 +45,17 @@ function handleError(res, reason, message, code) {
 
 // get all posts
 app.get("/api/posts", function(req, res) {
-    res.status(200).json({posts: POSTS})
+    // query DB
+    // return an array of post objects
+    const text = 'SELECT title, body FROM hardball.posts;'
+    POOL.query(text, (err, result) => {
+        if (err) throw err;
+        const posts = [];
+        for (let row of result.rows) {
+            posts.push(row);
+        }
+        res.status(200).json({posts: posts})
+    });
 })
 
 // get all players
@@ -40,7 +65,7 @@ app.get("/api/players", function(req, res) {
 
 // add a player
 app.post("/api/players", function(req, res) {
-    var newPlayer = req.body;
+    let newPlayer = req.body;
     if (newPlayer.hasOwnProperty("name") && newPlayer.hasOwnProperty("number")) {
         PLAYERS.push({
             "name": newPlayer.name,
@@ -48,14 +73,14 @@ app.post("/api/players", function(req, res) {
         });
         res.status(201);
     } else {
-        var message = "data is malformed, requires 'name' and 'number' keys"
+        let message = "data is malformed, requires 'name' and 'number' keys"
         handleError(res, "Bad request", message, 400);
     }
 });
 
 // get a player by name
 app.get("/api/players/:name", function(req, res) {
-    for (var i = 0; i < PLAYERS.length; i++) {
+    for (let i = 0; i < PLAYERS.length; i++) {
         if (PLAYERS[i].name === req.params.name) {
             res.status(200).json(PLAYERS[i]);
         }
