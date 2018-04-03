@@ -25,11 +25,11 @@ export class AdminComponent {
         });
     }
 
-    private get formTitle(): string {
+    public get formTitle(): string {
         return this.newPostForm.controls['title'].value;
     }
 
-    private get formBody(): string {
+    public get formBody(): string {
         return this.newPostForm.controls['body'].value;
     }
 
