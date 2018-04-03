@@ -4,7 +4,7 @@ This project was generated with [Angular CLI](https://github.com/angular/angular
 
 ## Development server
 
-Run `npm run build` to generate bundles
+Run `ng build` to generate bundles
 Run `npm run start` to start a an express server
 Navigate to `http://localhost:8080/`
 
