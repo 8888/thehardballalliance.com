@@ -36,7 +36,12 @@ export class AdminComponent {
     public onSubmit(): void {
         if (this.newPostForm.valid) {
             const post = new Post(this.formTitle, this.formBody);
-            this.nfs.submitNewPost(post);
+            this.nfs.submitNewPost(post).subscribe(result => {
+                // http.post just creates an observable
+                // you must subscribe to actually send the request
+                // TODO: inform user if successful or not
+                console.log(result);
+            });
             this.newPostForm.reset();
         }
     }

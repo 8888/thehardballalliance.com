@@ -18,9 +18,10 @@ export class NewsFeedService {
         return this.http.get(this.postsUrl);
     }
 
-    public submitNewPost(post: Post): void {
+    public submitNewPost(post: Post): Observable<object> {
         // receives a Post object
         // send this data to the server to handle
-        console.log(post);
+        const url = this.postsUrl + '/create';
+        return this.http.post(url, post);
     }
 }

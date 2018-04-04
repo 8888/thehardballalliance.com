@@ -58,6 +58,24 @@ app.get("/api/posts", function(req, res) {
     });
 })
 
+// create a news feed post
+app.post("/api/posts/create", function(req, res) {
+    // receives a Post object
+    // {title: string, body: string}
+    // add this to the DB
+    let newPost = req.body;
+    if (newPost.hasOwnProperty("title") && newPost.hasOwnProperty("body")) {
+        // data is valid
+        // INSERT into DB
+        const text = 'INSERT INTO hardball.posts (title, body) VALUES ($1, $2);'
+        const values = [newPost.title, newPost.body];
+        POOL.query(text, values, (err, result) => {
+            if (err) throw err;
+            res.status(201).json(newPost);
+        });
+    }
+})
+
 // get all players
 app.get("/api/players", function(req, res) {
     res.status(200).json({players: PLAYERS});
