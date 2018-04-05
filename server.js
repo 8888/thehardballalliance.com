@@ -3,6 +3,7 @@
 let express = require("express");
 let bodyParser = require("body-parser");
 let { Client, Pool } = require("pg");
+const crypto = require("crypto");
 
 // load .env if not in prod
 let SSL = true; // user SSL in prod, not on local host
@@ -36,6 +37,11 @@ const PLAYERS = [
     {name: "lee", number: 8},
     {name: "nora", number: 0}
 ];
+
+function generatePasswordHash(secret, salt) {
+    const hash = crypto.pbkdf2Sync(secret, salt, 100000, 64, 'sha256');
+    return hash.toString('hex');
+}
 
 // Generic error handler
 function handleError(res, reason, message, code) {
@@ -81,11 +87,32 @@ app.post("/api/auth/login", function(req, res) {
     // receives a username and password object
     // {username: string, password: string}
     // confirm auth with the DB
-    let user = req.body;
-    console.log('login!');
-    console.log(user);
-    res.status(200).json(user);
-})
+    const user = req.body;
+    const name = user['username'];
+    const pass = user['password'];
+    const text = 'SELECT salt, token, pass_hash FROM hardball.auth WHERE username = $1;'
+    const values = [name];
+    POOL.query(text, values, (err, result) => {
+        if (err) throw err;
+        // should only return 1
+        if (result.rows.length === 1) {
+            const salt = result.rows[0]['salt'];
+            const pass_hash = result.rows[0]['pass_hash'];
+            // check if password hashes match
+            if (generatePasswordHash(pass, salt) === pass_hash) {
+                // password is correct
+                const token = result.rows[0]['token'];
+                res.status(200).json({'user': user, 'token': token});
+            } else {
+                // password is incorrect
+                res.status(401).json({'user': user, 'error': 'Either the username or password is incorrect'});
+            }
+        } else {
+            // username not found
+            res.status(401).json({'user': user, 'error': 'Either the username or password is incorrect'});
+        }
+    });
+});
 
 // create a new user
 app.post("/api/auth/register", function(req, res) {
@@ -93,11 +120,75 @@ app.post("/api/auth/register", function(req, res) {
     // {username: string, password: string}
     // confirm that the username is whitelisted to register
     // adds the user to the DB
-    let user = req.body;
-    console.log('register!');
-    console.log(user);
-    res.status(200).json(user);
-})
+    const user = req.body;
+    const name = user['username'];
+    const pass = user['password'];
+    // create a multiple transaction connection
+    POOL.connect((err, client, done) => {
+        const shouldAbort = (err) => {
+            // cleanup function if there is an error
+            if (err) {
+                console.error('Error in transaction', err.stack)
+                client.query('ROLLBACK', (err) => {
+                    if (err) {
+                        console.error('Error rolling back client', err.stack)
+                    }
+                    // release the client back to the pool
+                    done();
+                });
+            }
+            return !!err // cast to bool
+        }
+
+        // BEGIN the transaction
+        client.query('BEGIN', (err) => {
+            if (shouldAbort(err)) return;
+            // first query if this username is in the DB
+            // return username and token
+            const selectText = 'SELECT id, username, token FROM hardball.auth WHERE username = $1;'
+            const selectValues = [name];
+            client.query(selectText, selectValues, (err, result) => {
+                if (shouldAbort(err)) return;
+                // username is a unique value, can only return 1 row
+                if (result.rows.length) {
+                    // username was found
+                    if (!result.rows[0]['token']) {
+                        // token is empty
+                        // user is allowed to register
+                        const rowId = result.rows[0]['id'];
+                        const token = crypto.randomBytes(32).toString('hex');
+                        const salt = crypto.randomBytes(32).toString('hex');
+                        const passHash = generatePasswordHash(pass, salt);
+                        // UPDATE the row
+                        const updateText = 'UPDATE hardball.auth SET salt = $1, token = $2, pass_hash = $3 WHERE id = $4;';
+                        const updateValues = [salt, token, passHash, rowId];
+                        client.query(updateText, updateValues, (err, result) => {
+                            if (shouldAbort(err)) return;
+                            // succesfully updates
+                            // COMMIT the changes
+                            client.query('COMMIT', (err) => {
+                                if (err) {
+                                    console.error('Error committing transaction!', err.stack);
+                                }
+                                done();
+                                res.status(201).json({'user': name});
+                            })
+                        });
+                    } else {
+                        // token found
+                        // user is already registered
+                        done();
+                        res.status(409).json({'error': 'User is already registered!'}); // 409 Conflict
+                    }
+                } else {
+                    // username was not found
+                    done();
+                    res.status(403).json({'error': 'This user is not allowed to register!'}); // 403 Forbidden
+                }
+            });
+        });
+    });
+});
 
 // get all players
 app.get("/api/players", function(req, res) {
