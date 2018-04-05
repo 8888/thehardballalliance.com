@@ -49,4 +49,11 @@ export class LoginService {
         });
         return this.http.post(url, body, this.httpOptions);
     }
+
+    public storeUserData(username: string, token: string): void {
+        // receives user data after being logged in
+        // stores in session storage
+        this.sessionStorage.setItem('username', username);
+        this.sessionStorage.setItem('token', token);
+    }
 }

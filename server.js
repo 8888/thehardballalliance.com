@@ -102,14 +102,14 @@ app.post("/api/auth/login", function(req, res) {
             if (generatePasswordHash(pass, salt) === pass_hash) {
                 // password is correct
                 const token = result.rows[0]['token'];
-                res.status(200).json({'user': user, 'token': token});
+                res.status(200).json({'user': name, 'status': 200, 'token': token});
             } else {
                 // password is incorrect
-                res.status(401).json({'user': user, 'error': 'Either the username or password is incorrect'});
+                res.status(401).json({'user': name, 'status': 401, 'error': 'Either the username or password is incorrect'});
             }
         } else {
             // username not found
-            res.status(401).json({'user': user, 'error': 'Either the username or password is incorrect'});
+            res.status(401).json({'user': name, 'status': 401, 'error': 'Either the username or password is incorrect'});
         }
     });
 });
@@ -171,19 +171,19 @@ app.post("/api/auth/register", function(req, res) {
                                     console.error('Error committing transaction!', err.stack);
                                 }
                                 done();
-                                res.status(201).json({'user': name});
+                                res.status(201).json({'user': name, 'status': 201,});
                             })
                         });
                     } else {
                         // token found
                         // user is already registered
                         done();
-                        res.status(409).json({'error': 'User is already registered!'}); // 409 Conflict
+                        res.status(409).json({'status': 409, 'error': 'User is already registered!'}); // 409 Conflict
                     }
                 } else {
                     // username was not found
                     done();
-                    res.status(403).json({'error': 'This user is not allowed to register!'}); // 403 Forbidden
+                    res.status(403).json({'status': 403, 'error': 'This user is not allowed to register!'}); // 403 Forbidden
                 }
             });
         });

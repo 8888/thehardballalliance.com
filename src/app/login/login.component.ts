@@ -1,7 +1,10 @@
 import { Component } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { Router } from '@angular/router';
 
 import { LoginService } from './login.service';
+
+import { AppSettings } from '../appSettings';
 
 @Component({
     selector: 'app-login',
@@ -15,7 +18,8 @@ export class LoginComponent {
 
     constructor(
         private fb: FormBuilder,
-        private loginService: LoginService
+        private loginService: LoginService,
+        private router: Router
     ) {
         this.createLoginForm();
         this.createRegistrationForm();
@@ -71,8 +75,21 @@ export class LoginComponent {
                 this.loginPassword,
                 this.loginRemember
             ).subscribe(output => {
-                console.log(output);
+                this.handleLoginResponse(output);
             });
+        }
+    }
+
+    private handleLoginResponse(response: object): void {
+        // response is an object sent back from the server
+        // {user: required, status: required, token: only if successful, error: only if error}
+        if (response['status'] === 200 && 'token' in response) {
+            // successfully logged in
+            this.loginService.storeUserData(response['user'], response['token']);
+            this.router.navigateByUrl('/' + AppSettings.CLIENT_ADMIN_URL);
+        } else {
+            // log in failed
+            // TODO: provide user w/ feedback
         }
     }
 
@@ -83,6 +100,7 @@ export class LoginComponent {
                 this.registerPasssword
             ).subscribe(output => {
                 console.log(output);
+                // TODO: handle response and provide feedback
             });
         }
     }
