@@ -76,6 +76,29 @@ app.post("/api/posts/create", function(req, res) {
     }
 })
 
+// authorize a user
+app.post("/api/auth/login", function(req, res) {
+    // receives a username and password object
+    // {username: string, password: string}
+    // confirm auth with the DB
+    let user = req.body;
+    console.log('login!');
+    console.log(user);
+    res.status(200).json(user);
+})
+
+// create a new user
+app.post("/api/auth/register", function(req, res) {
+    // receives a username and password object
+    // {username: string, password: string}
+    // confirm that the username is whitelisted to register
+    // adds the user to the DB
+    let user = req.body;
+    console.log('register!');
+    console.log(user);
+    res.status(200).json(user);
+})
+
 // get all players
 app.get("/api/players", function(req, res) {
     res.status(200).json({players: PLAYERS});

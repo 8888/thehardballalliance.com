@@ -13,6 +13,8 @@ import { NewsComponent } from './newsFeed/news.component';
 import { NewsFeedComponent } from './newsFeed/news-feed.component';
 import { NewsPostComponent } from './newsFeed/news-post.component';
 import { NewsFeedService } from './newsFeed/news-feed.service';
+import { LoginComponent } from './login/login.component';
+import { LoginService } from './login/login.service';
 import { AdminComponent } from './admin/admin.component';
 import { PlayerListComponent } from './player/player-list.component';
 import { PlayerDetailsComponent } from './player/player-details.component';
@@ -28,6 +30,7 @@ import { PlayerDetailsComponent } from './player/player-details.component';
     NewsFeedComponent,
     NewsPostComponent,
     AdminComponent,
+    LoginComponent,
     PlayerListComponent,
     PlayerDetailsComponent
   ],
@@ -39,7 +42,8 @@ import { PlayerDetailsComponent } from './player/player-details.component';
     AppRoutingModule
   ],
   providers: [
-    NewsFeedService
+    NewsFeedService,
+    LoginService
   ],
   bootstrap: [AppComponent]
 })
