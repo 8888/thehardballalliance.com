@@ -17,9 +17,22 @@ export class LoginService {
         this.sessionStorage = window.sessionStorage;
     }
 
-    public get username(): string {
+    public get rememberedUsername(): string {
+        // username from LOCAL storage for remember me
         const username = this.localStorage.username ? this.localStorage.username : '';
         return username;
+    }
+
+    public get username(): string {
+        // username from SESSION storage for API access
+        const username = this.sessionStorage.username ? this.sessionStorage.username : '';
+        return username;
+    }
+
+    public get token(): string {
+        // token from SESSION storage for API access
+        const token = this.sessionStorage.token ? this.sessionStorage.token : '';
+        return token;
     }
 
     public userIsLoggedIn(): boolean {

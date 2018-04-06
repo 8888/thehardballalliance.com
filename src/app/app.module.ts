@@ -4,6 +4,7 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { HttpClientModule } from '@angular/common/http';
 
 import { AppRoutingModule } from './app-routing.module';
+import { httpInterceptorProviders } from './httpInterceptors/http-interceptors';
 
 import { AppComponent } from './app.component';
 import { GameResultsComponent } from './gameResults/game-results.component';
@@ -42,6 +43,7 @@ import { PlayerDetailsComponent } from './player/player-details.component';
     AppRoutingModule
   ],
   providers: [
+    httpInterceptorProviders,
     NewsFeedService,
     LoginService
   ],

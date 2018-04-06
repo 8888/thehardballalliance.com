@@ -43,6 +43,22 @@ function generatePasswordHash(secret, salt) {
     return hash.toString('hex');
 }
 
+async function userIsAuthorized(auth) {
+    // query DB to confirm that this username and token are valid
+    // auth is a string of username:token
+    const split = auth.split(':');
+    const user = split[0];
+    const token = split[1];
+    // query DB
+    const text = 'SELECT id FROM hardball.auth WHERE username=$1 AND token=$2;';
+    const values = [user, token];
+    await POOL.query(text, values, (err, result) => {
+        if (err) throw err;
+        // if a row was found the user is authorized
+        return result.rows.length;
+    });
+}
+
 // Generic error handler
 function handleError(res, reason, message, code) {
     console.log("Error: " + reason);
@@ -69,18 +85,27 @@ app.post("/api/posts/create", function(req, res) {
     // receives a Post object
     // {title: string, body: string}
     // add this to the DB
-    let newPost = req.body;
-    if (newPost.hasOwnProperty("title") && newPost.hasOwnProperty("body")) {
-        // data is valid
-        // INSERT into DB
-        const text = 'INSERT INTO hardball.posts (title, body) VALUES ($1, $2);'
-        const values = [newPost.title, newPost.body];
-        POOL.query(text, values, (err, result) => {
-            if (err) throw err;
-            res.status(201).json(newPost);
-        });
+    // ISSUE
+    // userIsAuthorized returns a promise object
+    // so it is always true, even if the promise will eventually return false
+    // fix async issue!
+    if (false) { // temporary blocker!
+    // if ('authorization' in req.headers && userIsAuthorized(req.headers['authorization'])) {
+        let newPost = req.body;
+        if (newPost.hasOwnProperty("title") && newPost.hasOwnProperty("body")) {
+            // data is valid
+            // INSERT into DB
+            const text = 'INSERT INTO hardball.posts (title, body) VALUES ($1, $2);'
+            const values = [newPost.title, newPost.body];
+            POOL.query(text, values, (err, result) => {
+                if (err) throw err;
+                res.status(201).json(newPost);
+            });
+        }
+    } else {
+        res.status(401).json({error: 'Unauthorized!'});
     }
-})
+});
 
 // authorize a user
 app.post("/api/auth/login", function(req, res) {

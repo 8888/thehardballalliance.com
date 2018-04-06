@@ -30,7 +30,7 @@ export class LoginComponent implements OnInit {
     ngOnInit() {
         // set the username field if a user checked Remember me
         this.loginForm.patchValue(
-            {username: this.loginService.username},
+            {username: this.loginService.rememberedUsername},
             {emitEvent: false}
         );
     }
