@@ -25,6 +25,9 @@
   </div>
   <div class="row justify-content-md-center">
     <div class="col-4">
+      <div *ngIf="message" class="alert" [ngClass]="{'alert-danger': messageIsError, 'alert-success': !messageIsError}" role="alert">
+          {{message}}
+      </div>
       <div *ngIf="displayLogin; else displayRegister">
         <form [formGroup]="loginForm" (ngSubmit)="onLoginSubmit()">
           <div class="form-group row">

@@ -22,6 +22,11 @@ export class LoginService {
         return username;
     }
 
+    public userIsLoggedIn(): boolean {
+        // confirms if a user is logged in or not
+        return ('username' in this.sessionStorage && 'token' in this.sessionStorage);
+    }
+
     public submitLogin(username: string, password: string, remember: boolean): Observable<object> {
         // called by the login component
         // creates HTTP request to server to authorize user

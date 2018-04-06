@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 
@@ -11,10 +11,12 @@ import { AppSettings } from '../appSettings';
     templateUrl: './login.component.html',
     styleUrls: ['./login.component.css']
 })
-export class LoginComponent {
+export class LoginComponent implements OnInit {
     public loginForm: FormGroup;
     public registerForm: FormGroup;
     public displayLogin = true;
+    public message: string; // login feedback
+    public messageIsError: boolean; // handles style class
 
     constructor(
         private fb: FormBuilder,
@@ -23,6 +25,14 @@ export class LoginComponent {
     ) {
         this.createLoginForm();
         this.createRegistrationForm();
+    }
+
+    ngOnInit() {
+        // set the username field if a user checked Remember me
+        this.loginForm.patchValue(
+            {username: this.loginService.username},
+            {emitEvent: false}
+        );
     }
 
     private createLoginForm(): void {
@@ -68,6 +78,13 @@ export class LoginComponent {
         this.displayLogin = button === 'login' ? true : false;
     }
 
+    private setMessage(message: string, error: boolean): void {
+        // sets the message to be displayed
+        // error: true=red false=green
+        this.message = message;
+        this.messageIsError = error;
+    }
+
     public onLoginSubmit(): void {
         if (this.loginForm.valid) {
             this.loginService.submitLogin(
@@ -76,6 +93,10 @@ export class LoginComponent {
                 this.loginRemember
             ).subscribe(output => {
                 this.handleLoginResponse(output);
+            }, error => {
+                // error = {error: {error: message}, otherkey: {}, etc}
+                this.setMessage(error['error']['error'], true);
+                this.loginForm.reset();
             });
         }
     }
@@ -86,10 +107,8 @@ export class LoginComponent {
         if (response['status'] === 200 && 'token' in response) {
             // successfully logged in
             this.loginService.storeUserData(response['user'], response['token']);
+            this.loginForm.reset();
             this.router.navigateByUrl('/' + AppSettings.CLIENT_ADMIN_URL);
-        } else {
-            // log in failed
-            // TODO: provide user w/ feedback
         }
     }
 
@@ -99,9 +118,23 @@ export class LoginComponent {
                 this.registerUsername,
                 this.registerPasssword
             ).subscribe(output => {
-                console.log(output);
-                // TODO: handle response and provide feedback
+                this.handleRegisterResponse(output);
+            }, error => {
+                // error = {error: {error: message}, otherkey: {}, etc}
+                this.setMessage(error['error']['error'], true);
+                this.registerForm.reset();
             });
+        }
+    }
+
+    private handleRegisterResponse(response: object): void {
+        // response is an object sent back from the server
+        // {user: only if successful, status: required, error: only if error}
+        if (response['status'] === 201) {
+            // user created
+            this.registerForm.reset();
+            this.setMessage('User created! Please login', false);
+            this.displayLogin = true;
         }
     }
 }
