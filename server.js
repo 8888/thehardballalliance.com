@@ -52,11 +52,8 @@ async function userIsAuthorized(auth) {
     // query DB
     const text = 'SELECT id FROM hardball.auth WHERE username=$1 AND token=$2;';
     const values = [user, token];
-    await POOL.query(text, values, (err, result) => {
-        if (err) throw err;
-        // if a row was found the user is authorized
-        return result.rows.length;
-    });
+    const { rows } = await POOL.query(text, values);
+    return rows.length === 1; // bool of is user was found in DB
 }
 
 // Generic error handler
@@ -85,26 +82,21 @@ app.post("/api/posts/create", function(req, res) {
     // receives a Post object
     // {title: string, body: string}
     // add this to the DB
-    // ISSUE
-    // userIsAuthorized returns a promise object
-    // so it is always true, even if the promise will eventually return false
-    // fix async issue!
-    if (false) { // temporary blocker!
-    // if ('authorization' in req.headers && userIsAuthorized(req.headers['authorization'])) {
-        let newPost = req.body;
-        if (newPost.hasOwnProperty("title") && newPost.hasOwnProperty("body")) {
-            // data is valid
-            // INSERT into DB
-            const text = 'INSERT INTO hardball.posts (title, body) VALUES ($1, $2);'
-            const values = [newPost.title, newPost.body];
-            POOL.query(text, values, (err, result) => {
-                if (err) throw err;
+    (async () => {
+        if ('authorization' in req.headers && await userIsAuthorized(req.headers['authorization'])) {
+            let newPost = req.body;
+            if (newPost.hasOwnProperty("title") && newPost.hasOwnProperty("body")) {
+                // data is valid
+                // INSERT into DB
+                const text = 'INSERT INTO hardball.posts (title, body) VALUES ($1, $2);'
+                const values = [newPost.title, newPost.body];
+                await POOL.query(text, values);
                 res.status(201).json(newPost);
-            });
+            }
+        } else {
+            res.status(401).json({error: 'Unauthorized!'});
         }
-    } else {
-        res.status(401).json({error: 'Unauthorized!'});
-    }
+    })().catch(e => console.error(e.stack));
 });
 
 // authorize a user
