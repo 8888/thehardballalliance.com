@@ -5,6 +5,7 @@ import { Router } from '@angular/router';
 import { LoginService } from './login.service';
 
 import { AppSettings } from '../appSettings';
+import { identicalValuesValidator } from '../shared/identical-values.directive';
 
 @Component({
     selector: 'app-login',
@@ -62,6 +63,8 @@ export class LoginComponent implements OnInit {
             username: ['', Validators.required],
             password: ['', Validators.required],
             confirmPassword: ['', Validators.required] // TODO: validator to confirm theyre the same
+        }, {
+            validator: identicalValuesValidator('password', 'confirmPassword')
         });
     }
 
