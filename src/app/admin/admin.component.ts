@@ -14,6 +14,8 @@ import { AppSettings } from '../appSettings';
 })
 export class AdminComponent implements OnInit {
     public newPostForm: FormGroup;
+    public message: string;
+    public messageIsError: boolean; // handles style class
 
     constructor(
         private fb: FormBuilder,
@@ -47,15 +49,39 @@ export class AdminComponent implements OnInit {
         return this.newPostForm.controls['body'].value;
     }
 
+    private async setMessage(message: string, error: boolean, length = 5000): Promise<any> {
+        // sets the message to be displayed
+        // error: true=red false=green
+        // length is time to display message for in ms, default is 5 seconds
+        this.message = message;
+        this.messageIsError = error;
+        (async () => {
+            await (() => {
+                return new Promise(resolve => setTimeout(resolve, length));
+            })();
+            this.message = '';
+        })();
+    }
+
     public onSubmit(): void {
         if (this.newPostForm.valid) {
             const post = new Post(this.formTitle, this.formBody);
-            this.nfs.submitNewPost(post).subscribe(result => {
-                // http.post just creates an observable
-                // you must subscribe to actually send the request
-                // TODO: inform user if successful or not
-                console.log(result);
-            });
+            this.nfs.submitNewPost(post).subscribe(
+                result => {
+                    // created successfully
+                    this.setMessage('Post created successfully!', false);
+                },
+                error => {
+                    // error is an HttpErrorResponse object
+                    // keys: status, statusText, url
+                    if (error.status === 401) {
+                        // unauthorized
+                        this.router.navigateByUrl('/' + AppSettings.CLIENT_ADMIN_LOGIN_URL);
+                    } else {
+                        this.setMessage(error.statusText, true);
+                    }
+                }
+            );
             this.newPostForm.reset();
         }
     }

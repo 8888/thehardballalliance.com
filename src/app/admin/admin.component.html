@@ -16,6 +16,9 @@
         <button type="submit" [disabled]="!newPostForm.valid" class="btn btn-success">
           Submit New Post
         </button>
+        <div *ngIf="message" class="alert" [ngClass]="{'alert-danger': messageIsError, 'alert-success': !messageIsError}" role="alert">
+          {{message}}
+        </div>
       </form>
     </div> <!-- Form -->
     <div class="col">

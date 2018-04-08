@@ -91,12 +91,15 @@ app.post("/api/posts/create", function(req, res) {
                 const text = 'INSERT INTO hardball.posts (title, body) VALUES ($1, $2);'
                 const values = [newPost.title, newPost.body];
                 await POOL.query(text, values);
-                res.status(201).json(newPost);
+                res.status(201).json({status: 201, post: newPost});
             }
         } else {
             res.status(401).json({error: 'Unauthorized!'});
         }
-    })().catch(e => console.error(e.stack));
+    })().catch(e => {
+        console.error(e.stack);
+        res.status(500).json({error: 'An unexpected error occured!'});
+    });
 });
 
 // authorize a user
