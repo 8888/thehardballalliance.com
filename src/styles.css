@@ -1,1 +1,14 @@
-@import url('https://unpkg.com/bootstrap@3.3.7/dist/css/bootstrap.min.css')
+@import url('https://unpkg.com/bootstrap@3.3.7/dist/css/bootstrap.min.css');
+@import url('https://fonts.googleapis.com/css?family=Playfair+Display|Graduate|Work+Sans');
+
+p {
+    font-family: 'Playfair Display', serif;
+}
+
+h1, h2, h3, h4, h5, h6 {
+    font-family: 'Work Sans', sans-serif;
+}
+
+button {
+    font-family: 'Work Sans', sans-serif;
+}

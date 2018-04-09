@@ -10,6 +10,7 @@ import { AppComponent } from './app.component';
 import { GameResultsComponent } from './gameResults/game-results.component';
 import { LeagueLeadersComponent } from './leagueLeaders/league-leaders.component';
 import { NavBarComponent } from './navBar/nav-bar.component';
+import { FooterComponent } from './footer/footer.component';
 import { NewsComponent } from './newsFeed/news.component';
 import { NewsFeedComponent } from './newsFeed/news-feed.component';
 import { NewsPostComponent } from './newsFeed/news-post.component';
@@ -27,6 +28,7 @@ import { PlayerDetailsComponent } from './player/player-details.component';
     GameResultsComponent,
     LeagueLeadersComponent,
     NavBarComponent,
+    FooterComponent,
     NewsComponent,
     NewsFeedComponent,
     NewsPostComponent,

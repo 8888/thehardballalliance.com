@@ -1,0 +1,24 @@
+hr {
+    border: none;
+    height: 1px;
+    color: darkgray;
+    background-color: darkgray;
+}
+
+.pLink {
+    cursor: pointer;
+}
+
+a {
+    text-decoration: none;
+    color: inherit;
+}
+
+p {
+    font-size: 0.75em;
+}
+
+p img {
+    height: 1.5em;
+    width: auto;
+}
