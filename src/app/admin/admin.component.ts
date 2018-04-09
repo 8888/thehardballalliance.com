@@ -35,9 +35,12 @@ export class AdminComponent implements OnInit {
     }
 
     private createForm(): void {
+        const ts = Date.now();
         this.newPostForm = this.fb.group({
             title: ['', Validators.required],
-            body: ['', Validators.required]
+            body: ['', Validators.required],
+            publishDate: [ts, Validators.required],
+            createDate: [ts, Validators.required],
         });
     }
 
@@ -47,6 +50,14 @@ export class AdminComponent implements OnInit {
 
     public get formBody(): string {
         return this.newPostForm.controls['body'].value;
+    }
+
+    public get formPublishDate(): number {
+        return this.newPostForm.controls['publishDate'].value;
+    }
+
+    public get formCreateDate(): number {
+        return this.newPostForm.controls['createDate'].value;
     }
 
     private async setMessage(message: string, error: boolean, length = 5000): Promise<any> {
@@ -65,7 +76,7 @@ export class AdminComponent implements OnInit {
 
     public onSubmit(): void {
         if (this.newPostForm.valid) {
-            const post = new Post(this.formTitle, this.formBody);
+            const post = new Post(this.formTitle, this.formBody, this.formPublishDate, this.formCreateDate);
             this.nfs.submitNewPost(post).subscribe(
                 result => {
                     // created successfully

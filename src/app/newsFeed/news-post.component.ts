@@ -1,4 +1,4 @@
-import { Component, Input } from '@angular/core';
+import { Component, Input, OnChanges } from '@angular/core';
 
 import { NewsFeedService } from './news-feed.service';
 
@@ -7,9 +7,17 @@ import { NewsFeedService } from './news-feed.service';
     templateUrl: './news-post.component.html',
     styleUrls: ['./news-post.component.css']
 })
-export class NewsPostComponent {
+export class NewsPostComponent implements OnChanges {
     @Input() title: string;
     @Input() body: string;
+    @Input() timestamp: number;
+    timestampString: string;
 
     constructor(private nfs: NewsFeedService) {}
+
+    ngOnChanges() {
+        if (this.timestamp) {
+            this.timestampString = new Date(this.timestamp).toLocaleString();
+        }
+    }
 }

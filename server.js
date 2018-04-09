@@ -66,7 +66,7 @@ function handleError(res, reason, message, code) {
 app.get("/api/posts", function(req, res) {
     // query DB
     // return an array of post objects
-    const text = 'SELECT title, body FROM hardball.posts;'
+    const text = 'SELECT title, body, publish_date FROM hardball.posts;'
     POOL.query(text, (err, result) => {
         if (err) throw err;
         const posts = [];
@@ -80,18 +80,26 @@ app.get("/api/posts", function(req, res) {
 // create a news feed post
 app.post("/api/posts/create", function(req, res) {
     // receives a Post object
-    // {title: string, body: string}
+    // {title: string, body: string, publishDate: int, createDate: int}
     // add this to the DB
     (async () => {
         if ('authorization' in req.headers && await userIsAuthorized(req.headers['authorization'])) {
             let newPost = req.body;
-            if (newPost.hasOwnProperty("title") && newPost.hasOwnProperty("body")) {
+            if (
+                newPost.hasOwnProperty("title") &&
+                newPost.hasOwnProperty("body") &&
+                newPost.hasOwnProperty("publishDate") &&
+                newPost.hasOwnProperty("createDate")
+            ) {
                 // data is valid
                 // INSERT into DB
-                const text = 'INSERT INTO hardball.posts (title, body) VALUES ($1, $2);'
-                const values = [newPost.title, newPost.body];
+                const text = 'INSERT INTO hardball.posts (title, body, publish_date, create_date) VALUES ($1, $2, $3, $4);'
+                const values = [newPost.title, newPost.body, newPost.publishDate, newPost.createDate];
                 await POOL.query(text, values);
                 res.status(201).json({status: 201, post: newPost});
+            } else {
+                // data is not valid
+                res.status(400).json({status: 400, error: 'Data is invalid'});
             }
         } else {
             res.status(401).json({error: 'Unauthorized!'});

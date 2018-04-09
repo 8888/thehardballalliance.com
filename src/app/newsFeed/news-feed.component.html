@@ -2,7 +2,8 @@
   <div *ngFor="let post of posts">
     <app-news-post
       [title]=post.title
-      [body]=post.body>
+      [body]=post.body
+      [timestamp]=post.publishDate>
     </app-news-post>
   </div>
 </div> <!-- Posts -->

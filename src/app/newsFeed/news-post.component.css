@@ -1,3 +1,10 @@
 .postBody {
     white-space: pre-wrap;
 }
+
+hr {
+    border: none;
+    height: 1px;
+    color: lightgray;
+    background-color: lightgray;
+}

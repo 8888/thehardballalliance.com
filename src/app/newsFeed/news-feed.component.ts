@@ -35,9 +35,12 @@ export class NewsFeedComponent {
         const result = [];
         for (let i = 0; i < posts.length; i++) {
             const post = posts[i];
-            if (post.hasOwnProperty('title') && post.hasOwnProperty('body')) {
+            if (post.hasOwnProperty('title') && post.hasOwnProperty('body') && post.hasOwnProperty('publish_date')) {
                 // data is valid
-                result.push(new Post(post['title'], post['body']));
+                // publish_date is of type bigInt in psql
+                // JS doesn't natively handle bigInt, so it is returned as a string
+                // parse back to an integer before creating Post object
+                result.push(new Post(post['title'], post['body'], parseInt(post['publish_date'], 10)));
             }
         }
         return result;
