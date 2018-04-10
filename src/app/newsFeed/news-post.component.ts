@@ -17,7 +17,13 @@ export class NewsPostComponent implements OnChanges {
 
     ngOnChanges() {
         if (this.timestamp) {
-            this.timestampString = new Date(this.timestamp).toLocaleString();
+            this.timestampString = new Date(this.timestamp).toLocaleString([], {
+                year: '2-digit',
+                month: 'numeric',
+                day: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit'
+            });
         }
     }
 }

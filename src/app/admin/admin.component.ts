@@ -34,13 +34,54 @@ export class AdminComponent implements OnInit {
         }
     }
 
+    private timestampToDate(timestamp: number): object {
+        // timestamp is ms since epoch
+        // creates an object with specific keys
+        // based upon the date from the timestamp
+        // can be passed into a formBuilder group to create a form
+        const date = new Date(timestamp);
+        const dateForm = {
+            year: date.getUTCFullYear(),
+            month: date.getUTCMonth() + 1, // month is 0-11
+            day: date.getUTCDate(),
+            hour: date.getUTCHours(),
+            minutes: date.getUTCMinutes(),
+            seconds: date.getUTCSeconds(),
+            ms: date.getUTCMilliseconds()
+        };
+        return dateForm;
+    }
+
+    private dateToTimestamp(date: object): number {
+        // takes an object as created by the method timestampToDate
+        // this is NOT the standard JS Date object, but it is also being used
+        // returns the ms since epoch, as JS Date object expects
+        const ts = Date.UTC(
+            date['year'],
+            date['month'] - 1, // month is 0-11
+            date['day'],
+            date['hour'],
+            date['minutes'],
+            date['seconds'],
+            date['ms']
+        );
+        return ts;
+    }
+
+    private resetFormDates(): void {
+        // sets the create date and publish date in the form
+        // used to reset to current value
+        const ts = Date.now();
+        this.newPostForm.patchValue({createDate: ts, publishDate: this.timestampToDate(ts)}, {emitEvent: false});
+    }
+
     private createForm(): void {
         const ts = Date.now();
         this.newPostForm = this.fb.group({
             title: ['', Validators.required],
             body: ['', Validators.required],
-            publishDate: [ts, Validators.required],
             createDate: [ts, Validators.required],
+            publishDate: this.fb.group(this.timestampToDate(ts))
         });
     }
 
@@ -53,7 +94,8 @@ export class AdminComponent implements OnInit {
     }
 
     public get formPublishDate(): number {
-        return this.newPostForm.controls['publishDate'].value;
+        const date = this.newPostForm.controls['publishDate'].value;
+        return this.dateToTimestamp(date);
     }
 
     public get formCreateDate(): number {
@@ -94,6 +136,7 @@ export class AdminComponent implements OnInit {
                 }
             );
             this.newPostForm.reset();
+            this.resetFormDates();
         }
     }
 }

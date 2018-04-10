@@ -7,12 +7,35 @@
           <label class="center-block">Title:
             <input class="form-control" formControlName="title">
           </label>
-        </div>
+        </div> <!-- title -->
         <div class="form-group">
           <label class="center-block">Body:
             <textarea class="form-control" formControlName="body"></textarea>
           </label>
-        </div>
+        </div> <!-- body -->
+        <label>Publish Date</label>
+        <div class="form-row" formGroupName="publishDate">
+          <div class="col-2">
+            <label>Month:</label>
+            <input type="number" class="form-control" formControlName="month">
+          </div>
+          <div class="col-2">
+            <label>Day:</label>
+            <input type="number" class="form-control" formControlName="day">
+          </div>
+          <div class="col-2">
+            <label>Year:</label>
+            <input type="number" class="form-control" formControlName="year">
+          </div>
+          <div class="col-2">
+            <label>Hour:</label>
+            <input type="number" class="form-control" formControlName="hour">
+          </div>
+          <div class="col-2">
+            <label>Minutes:</label>
+            <input type="number" class="form-control" formControlName="minutes">
+          </div>
+        </div> <!-- publishDate -->
         <button type="submit" [disabled]="!newPostForm.valid" class="btn btn-success">
           Submit New Post
         </button>
