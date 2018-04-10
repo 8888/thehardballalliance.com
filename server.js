@@ -32,12 +32,6 @@ const POOL = new Pool({
     ssl: SSL // heroku PG requries ssl
 });
 
-// Mock DB data
-const PLAYERS = [
-    {name: "lee", number: 8},
-    {name: "nora", number: 0}
-];
-
 function generatePasswordHash(secret, salt) {
     const hash = crypto.pbkdf2Sync(secret, salt, 100000, 64, 'sha256');
     return hash.toString('hex');
@@ -216,35 +210,6 @@ app.post("/api/auth/register", function(req, res) {
             });
         });
     });
-});
-
-// get all players
-app.get("/api/players", function(req, res) {
-    res.status(200).json({players: PLAYERS});
-});
-
-// add a player
-app.post("/api/players", function(req, res) {
-    let newPlayer = req.body;
-    if (newPlayer.hasOwnProperty("name") && newPlayer.hasOwnProperty("number")) {
-        PLAYERS.push({
-            "name": newPlayer.name,
-            "number": newPlayer.number
-        });
-        res.status(201);
-    } else {
-        let message = "data is malformed, requires 'name' and 'number' keys"
-        handleError(res, "Bad request", message, 400);
-    }
-});
-
-// get a player by name
-app.get("/api/players/:name", function(req, res) {
-    for (let i = 0; i < PLAYERS.length; i++) {
-        if (PLAYERS[i].name === req.params.name) {
-            res.status(200).json(PLAYERS[i]);
-        }
-    }
 });
 
 // catch all other get requests to be sent index.html

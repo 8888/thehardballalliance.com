@@ -18,9 +18,6 @@ import { NewsFeedService } from './newsFeed/news-feed.service';
 import { LoginComponent } from './login/login.component';
 import { LoginService } from './login/login.service';
 import { AdminComponent } from './admin/admin.component';
-import { PlayerListComponent } from './player/player-list.component';
-import { PlayerDetailsComponent } from './player/player-details.component';
-
 
 @NgModule({
   declarations: [
@@ -33,9 +30,7 @@ import { PlayerDetailsComponent } from './player/player-details.component';
     NewsFeedComponent,
     NewsPostComponent,
     AdminComponent,
-    LoginComponent,
-    PlayerListComponent,
-    PlayerDetailsComponent
+    LoginComponent
   ],
   imports: [
     BrowserModule,
