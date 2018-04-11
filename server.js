@@ -58,10 +58,16 @@ function handleError(res, reason, message, code) {
 
 // get all posts
 app.get("/api/posts", function(req, res) {
-    // query DB
+    // can receive a start and end timestamp in query string
+    // ?start=0000&stop=0000
+    // values are ms timestamp of range to get posts from
+    // if range isn't supplied, get all posts from the DB
     // return an array of post objects
-    const text = 'SELECT title, body, publish_date FROM hardball.posts;'
-    POOL.query(text, (err, result) => {
+    const start = req.query.start ? req.query.start : Date.UTC(1988, 8, 8);
+    const end = req.query.end ? req.query.end : Date.now();
+    const text = 'SELECT title, body, publish_date FROM hardball.posts WHERE PUBLISH_DATE BETWEEN $1 AND $2;'
+    const values = [start, end];
+    POOL.query(text, values, (err, result) => {
         if (err) throw err;
         const posts = [];
         for (let row of result.rows) {

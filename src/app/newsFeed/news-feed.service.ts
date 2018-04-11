@@ -11,11 +11,18 @@ export class NewsFeedService {
 
     constructor(private http: HttpClient) {}
 
-    public fetchPosts(): Observable<object> {
+    public fetchPosts(range = null): Observable<object> {
         // call the server api for the post objects
+        // range is an optional argument of a range object
+        // {start: timestamp, end: timestamp}
+        // if range is supplied only get posts within this range
         // receives {posts: [{post}, {post}, ...]}
         // receives this and returns it as an Observable
-        return this.http.get(this.postsUrl);
+        let url = this.postsUrl;
+        if (range) {
+            url += '?start=' + range['start'] + '&end=' + range['end'];
+        }
+        return this.http.get(url);
     }
 
     public submitNewPost(post: Post): Observable<object> {

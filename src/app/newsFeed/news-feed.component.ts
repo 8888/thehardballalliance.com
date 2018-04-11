@@ -18,12 +18,16 @@ export class NewsFeedComponent {
     }
 
     private fetchPosts(): void {
-        // contact nfs for posts
+        // contact nfs for posts within a range of dates
         // receives an observable
         // received as {posts: [{post}, {post}, ...]}
         // the obects need to be formatted
         // then assigned to the posts array to be displayed
-        this.nfs.fetchPosts().subscribe(result => {
+        const range = {
+            start: Date.UTC(1988, 8, 8),
+            end: Date.now()
+        };
+        this.nfs.fetchPosts(range).subscribe(result => {
             this.posts = this.formatPosts(result['posts']);
         });
     }
