@@ -12,6 +12,13 @@ export class NewsPostComponent implements OnChanges {
     @Input() body: string;
     @Input() timestamp: number;
     timestampString: string;
+    @Input() id: number; // DB primary key ID
+    // a post can be viewed in its full entirety
+    // if displayFull=true (default) all info will be shown
+    // used for news feed etc
+    // if displayFull=false then limited information is shown
+    // used for a compact view, in admin when choosing a post to edit
+    @Input() displayFull = true;
 
     constructor(private nfs: NewsFeedService) {}
 

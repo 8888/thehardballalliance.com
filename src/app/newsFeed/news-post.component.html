@@ -1,4 +1,10 @@
-<h1>{{title}}</h1>
-<p>{{timestampString}}</p>
-<hr>
-<p class="postBody">{{body}}</p>
+<div *ngIf="displayFull; else preview">
+  <h1>{{title}}</h1>
+  <p class="postBody">{{body}}</p>
+  <p>{{timestampString}}</p>
+  <hr>
+</div>
+<ng-template #preview>
+  <h4>{{title}}</h4>
+  <p>{{timestampString}}</p>
+</ng-template>

@@ -16,6 +16,7 @@ export class AdminComponent implements OnInit {
     public newPostForm: FormGroup;
     public message: string;
     public messageIsError: boolean; // handles style class
+    public posts: Post[];
 
     constructor(
         private fb: FormBuilder,
@@ -32,6 +33,7 @@ export class AdminComponent implements OnInit {
             // redirect to the login page
             this.router.navigateByUrl('/' + AppSettings.CLIENT_ADMIN_LOGIN_URL);
         }
+        this.fetchPosts();
     }
 
     private timestampToDate(timestamp: number): object {
@@ -100,6 +102,17 @@ export class AdminComponent implements OnInit {
 
     public get formCreateDate(): number {
         return this.newPostForm.controls['createDate'].value;
+    }
+
+    private fetchPosts(): void {
+        // contact nfs for all posts
+        // receives an observable
+        // received as {posts: [{post}, {post}, ...]}
+        // the obects need to be formatted
+        // then assigned to the posts array to be displayed
+        this.nfs.fetchPosts().subscribe(result => {
+            this.posts = this.nfs.formatPosts(result['posts']);
+        });
     }
 
     private async setMessage(message: string, error: boolean, length = 5000): Promise<any> {

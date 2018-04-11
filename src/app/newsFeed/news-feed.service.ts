@@ -25,6 +25,34 @@ export class NewsFeedService {
         return this.http.get(url);
     }
 
+    public formatPosts(posts: object[]): Post[] {
+        // takes an array of objects
+        // converts them to Post objects
+        // returns an array
+        const result = [];
+        for (let i = 0; i < posts.length; i++) {
+            const post = posts[i];
+            if (
+                post.hasOwnProperty('title') &&
+                post.hasOwnProperty('body') &&
+                post.hasOwnProperty('publish_date') &&
+                post.hasOwnProperty('id')
+            ) {
+                // data is valid
+                // publish_date is of type bigInt in psql
+                // JS doesn't natively handle bigInt, so it is returned as a string
+                // parse back to an integer before creating Post object
+                result.push(new Post(
+                    post['title'],
+                    post['body'],
+                    post['id'],
+                    parseInt(post['publish_date'], 10)
+                ));
+            }
+        }
+        return result;
+    }
+
     public submitNewPost(post: Post): Observable<object> {
         // receives a Post object
         // send this data to the server to handle

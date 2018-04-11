@@ -1,49 +1,65 @@
 <div class="container">
   <div class="row">
     <div class="col">
-      <label>Create a new post</label>
-      <form [formGroup]="newPostForm" (ngSubmit)="onSubmit()">
-        <div class="form-group">
-          <label class="center-block">Title:
-            <input class="form-control" formControlName="title">
-          </label>
-        </div> <!-- title -->
-        <div class="form-group">
-          <label class="center-block">Body:
-            <textarea class="form-control" formControlName="body"></textarea>
-          </label>
-        </div> <!-- body -->
-        <label>Publish Date</label>
-        <div class="form-row" formGroupName="publishDate">
-          <div class="col-2">
-            <label>Month:</label>
-            <input type="number" class="form-control" formControlName="month">
+      <div>
+        <label>Create a new post</label>
+        <form [formGroup]="newPostForm" (ngSubmit)="onSubmit()">
+          <div class="form-group">
+            <label class="center-block">Title:
+              <input class="form-control" formControlName="title">
+            </label>
+          </div> <!-- title -->
+          <div class="form-group">
+            <label class="center-block">Body:
+              <textarea class="form-control" formControlName="body"></textarea>
+            </label>
+          </div> <!-- body -->
+          <label>Publish Date</label>
+          <div class="form-row" formGroupName="publishDate">
+            <div class="col-2">
+              <label>Month:</label>
+              <input type="number" class="form-control" formControlName="month">
+            </div>
+            <div class="col-2">
+              <label>Day:</label>
+              <input type="number" class="form-control" formControlName="day">
+            </div>
+            <div class="col-2">
+              <label>Year:</label>
+              <input type="number" class="form-control" formControlName="year">
+            </div>
+            <div class="col-2">
+              <label>Hour:</label>
+              <input type="number" class="form-control" formControlName="hour">
+            </div>
+            <div class="col-2">
+              <label>Minutes:</label>
+              <input type="number" class="form-control" formControlName="minutes">
+            </div>
+          </div> <!-- publishDate -->
+          <button type="submit" [disabled]="!newPostForm.valid" class="btn btn-success">
+            Submit New Post
+          </button>
+          <div *ngIf="message" class="alert" [ngClass]="{'alert-danger': messageIsError, 'alert-success': !messageIsError}" role="alert">
+            {{message}}
           </div>
-          <div class="col-2">
-            <label>Day:</label>
-            <input type="number" class="form-control" formControlName="day">
-          </div>
-          <div class="col-2">
-            <label>Year:</label>
-            <input type="number" class="form-control" formControlName="year">
-          </div>
-          <div class="col-2">
-            <label>Hour:</label>
-            <input type="number" class="form-control" formControlName="hour">
-          </div>
-          <div class="col-2">
-            <label>Minutes:</label>
-            <input type="number" class="form-control" formControlName="minutes">
-          </div>
-        </div> <!-- publishDate -->
-        <button type="submit" [disabled]="!newPostForm.valid" class="btn btn-success">
-          Submit New Post
-        </button>
-        <div *ngIf="message" class="alert" [ngClass]="{'alert-danger': messageIsError, 'alert-success': !messageIsError}" role="alert">
-          {{message}}
+        </form>
+      </div> <!-- Form -->
+      <div>
+        <hr>
+        <label>Existing Posts</label>
+        <div *ngFor="let post of posts">
+          <app-news-post
+            [title]=post.title
+            [body]=post.body
+            [timestamp]=post.publishDate
+            [id]=post.id
+            [displayFull]=false>
+          </app-news-post>
+          <hr>
         </div>
-      </form>
-    </div> <!-- Form -->
+      </div> <!-- Existing posts -->
+    </div> <!-- Col 1 -->
     <div class="col">
       <label>Preview:</label>
       <app-news-post

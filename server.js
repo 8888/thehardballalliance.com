@@ -65,7 +65,12 @@ app.get("/api/posts", function(req, res) {
     // return an array of post objects
     const start = req.query.start ? req.query.start : Date.UTC(1988, 8, 8);
     const end = req.query.end ? req.query.end : Date.now();
-    const text = 'SELECT title, body, publish_date FROM hardball.posts WHERE PUBLISH_DATE BETWEEN $1 AND $2;'
+    const text = `
+        SELECT id, title, body, publish_date
+        FROM hardball.posts
+        WHERE publish_date BETWEEN $1 AND $2
+        ORDER BY publish_date DESC;
+    `
     const values = [start, end];
     POOL.query(text, values, (err, result) => {
         if (err) throw err;
