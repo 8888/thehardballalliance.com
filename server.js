@@ -63,8 +63,16 @@ app.get("/api/posts", function(req, res) {
     // values are ms timestamp of range to get posts from
     // if range isn't supplied, get all posts from the DB
     // return an array of post objects
-    const start = req.query.start ? req.query.start : Date.UTC(1988, 8, 8);
-    const end = req.query.end ? req.query.end : Date.now();
+
+    // postgreSQL is using bigint data type to store ms timestamp
+    // js number data type is a bit more restricted
+    // psql limit: +/-9223372036854775808
+    // js limit:   +/-   9007199254740991
+    // the JS limit represents the earliest and latest possible time
+    // which covers well over the uses case
+    // this gives us ~285k years before and after epoch!
+    const start = req.query.start ? req.query.start : -9007199254740991;
+    const end = req.query.end ? req.query.end : 9007199254740991;
     const text = `
         SELECT id, title, body, publish_date
         FROM hardball.posts
