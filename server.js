@@ -123,6 +123,67 @@ app.post("/api/posts/create", function(req, res) {
     });
 });
 
+// modify an exisiting post
+app.put("/api/posts/modify/:postId", function(req, res) {
+    // receives a Post object
+    // {title: string, body: string, id:int, publishDate: int, createDate: int}
+    // modify the post in DB at the provided id
+    (async () => {
+        if ('authorization' in req.headers && await userIsAuthorized(req.headers['authorization'])) {
+            let post = req.body;
+            let id = req.params.postId;
+            if (
+                post.hasOwnProperty("title") &&
+                post.hasOwnProperty("body") &&
+                post.hasOwnProperty("publishDate")
+                // create date is never changed
+            ) {
+                // data is valid
+                // UPDATE in DB
+                const text = `
+                    UPDATE hardball.posts
+                    SET title = $1, body = $2, publish_date = $3
+                    WHERE id = $4;
+                `;
+                const values = [post.title, post.body, post.publishDate, id];
+                await POOL.query(text, values);
+                res.status(200).json({status: 200, post: post});
+            } else {
+                // data is not valid
+                res.status(400).json({status: 400, error: 'Data is invalid'});
+            }
+        } else {
+            res.status(401).json({error: 'Unauthorized!'});
+        }
+    })().catch(e => {
+        console.error(e.stack);
+        res.status(500).json({error: 'An unexpected error occured!'});
+    });
+});
+
+// delete an exisiting post
+app.delete("/api/posts/delete/:postId", function(req, res) {
+    // receives the ID of the post to delete
+    (async () => {
+        if ('authorization' in req.headers && await userIsAuthorized(req.headers['authorization'])) {
+            let id = req.params.postId;
+            // DELETE row from DB
+            const text = `
+                DELETE FROM hardball.posts
+                WHERE id = $1;
+            `;
+            const values = [id];
+            await POOL.query(text, values);
+            res.status(200).json({status: 200, post: id});
+        } else {
+            res.status(401).json({error: 'Unauthorized!'});
+        }
+    })().catch(e => {
+        console.error(e.stack);
+        res.status(500).json({error: 'An unexpected error occured!'});
+    });
+});
+
 // authorize a user
 app.post("/api/auth/login", function(req, res) {
     // receives a username and password object

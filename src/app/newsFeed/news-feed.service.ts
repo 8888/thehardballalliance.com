@@ -59,4 +59,20 @@ export class NewsFeedService {
         const url = this.postsUrl + '/create';
         return this.http.post(url, post);
     }
+
+    public submitModifyPost(post: Post, postId: number): Observable<object> {
+        // receives a Post obejct
+        // formats the url with the id
+        // sends to the server to modify the post
+        const url = this.postsUrl + '/modify/' + postId;
+        return this.http.put(url, post);
+    }
+
+    public deletePost(postId: number): Observable<object> {
+        // receives a postId number
+        // this is the DB PK ID of the row to delete
+        // sends to server to delete
+        const url = this.postsUrl + '/delete/' + postId;
+        return this.http.delete(url);
+    }
 }

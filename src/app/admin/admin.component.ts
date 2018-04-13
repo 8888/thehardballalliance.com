@@ -7,6 +7,7 @@ import { Post } from '../newsFeed/post';
 import { LoginService } from '../login/login.service';
 
 import { AppSettings } from '../appSettings';
+import { HttpErrorResponse } from '@angular/common/http';
 
 @Component({
     selector: 'app-admin',
@@ -14,9 +15,18 @@ import { AppSettings } from '../appSettings';
 })
 export class AdminComponent implements OnInit {
     public newPostForm: FormGroup;
-    public message: string;
+    public message: string; // status message when submitting
     public messageIsError: boolean; // handles style class
     public posts: Post[];
+    // the form can be used to create a new post
+    // or to edit an existing post
+    // this will be the DB PK ID of the post being editied
+    // -1 if it is a new post
+    public editingPostId: number;
+    public editHeaders = {
+        new: 'Create a new post',
+        edit: 'You are editing an existing post!'
+    };
 
     constructor(
         private fb: FormBuilder,
@@ -24,6 +34,7 @@ export class AdminComponent implements OnInit {
         private nfs: NewsFeedService,
         private loginService: LoginService
     ) {
+        this.editingPostId = -1; // init to new post
         this.createForm();
     }
 
@@ -129,27 +140,86 @@ export class AdminComponent implements OnInit {
         })();
     }
 
+    private resetForm(): void {
+        // reset form values to empty
+        // reset date to now
+        // set editing to -1 to mark as new post
+        this.newPostForm.reset();
+        this.resetFormDates();
+        this.editingPostId = -1;
+    }
+
+    private handleHttpError(error: HttpErrorResponse) {
+        // keys: status, statusText, url
+        if (error.status === 401) {
+            // unauthorized
+            this.router.navigateByUrl('/' + AppSettings.CLIENT_ADMIN_LOGIN_URL);
+        } else {
+            this.setMessage(error.statusText, true);
+        }
+    }
+
     public onSubmit(): void {
         if (this.newPostForm.valid) {
-            const post = new Post(this.formTitle, this.formBody, this.formPublishDate, this.formCreateDate);
-            this.nfs.submitNewPost(post).subscribe(
-                result => {
-                    // created successfully
-                    this.setMessage('Post created successfully!', false);
-                },
-                error => {
-                    // error is an HttpErrorResponse object
-                    // keys: status, statusText, url
-                    if (error.status === 401) {
-                        // unauthorized
-                        this.router.navigateByUrl('/' + AppSettings.CLIENT_ADMIN_LOGIN_URL);
-                    } else {
-                        this.setMessage(error.statusText, true);
-                    }
-                }
-            );
-            this.newPostForm.reset();
-            this.resetFormDates();
+            const post = new Post(this.formTitle, this.formBody, this.editingPostId, this.formPublishDate, this.formCreateDate);
+            if (this.editingPostId === -1) {
+                // create a new post
+                this.nfs.submitNewPost(post).subscribe(
+                    result => {
+                        // created successfully
+                        this.setMessage('Post created successfully!', false);
+                    },
+                    error => this.handleHttpError(error)
+                );
+            } else {
+                // update an existing post
+                this.nfs.submitModifyPost(post, this.editingPostId).subscribe(
+                    result => {
+                        // updated successfully
+                        this.setMessage('Post updated successfully!', false);
+                    },
+                    error => this.handleHttpError(error)
+                );
+            }
+            // clear the form and update the posts
+            this.resetForm();
+            this.fetchPosts();
         }
+    }
+
+    public onClickSwitchToNew(): void {
+        this.resetForm();
+    }
+
+    public onClickEditPost(post: Post): void {
+        // set the post ID of the one being edited
+        this.editingPostId = post.id;
+        // patch value attempts to match all keys w/ form keys
+        // if a key doesn't exist in the form it skips it
+        this.newPostForm.patchValue(post, {emitEvent: false});
+        // publishDate in Post is a ms timestamp
+        // publishDate in the form is another form group
+        // this is so it can parse the ms timestamp
+        if (post.hasOwnProperty('publishDate')) {
+            this.newPostForm.controls['publishDate'].patchValue(
+                this.timestampToDate(post.publishDate),
+                {emitEvent: false}
+            );
+        }
+    }
+
+    public onClickDeletePost(post: Post): void {
+        this.nfs.deletePost(post.id).subscribe(
+            result => {
+                // deleted successfully
+                this.setMessage('Post deleted successfully!', false);
+            },
+            error => this.handleHttpError(error)
+        );
+        if (this.editingPostId === post.id) {
+            // this post was in the editing box
+            this.resetForm();
+        }
+        this.fetchPosts();
     }
 }
