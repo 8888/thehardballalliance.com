@@ -58,10 +58,7 @@
             </div>
             <div class="col">
               <app-news-post
-                [title]=post.title
-                [body]=post.body
-                [timestamp]=post.publishDate
-                [id]=post.id
+                [postObject]=post
                 [displayFull]=false>
               </app-news-post>
             </div>
@@ -75,7 +72,7 @@
       <app-news-post
         [title]=formTitle
         [body]=formBody
-        [timestamp]=formPublishDate>
+        [publishDate]=formPublishDate>
       </app-news-post>
     </div> <!-- Preview -->
   </div>

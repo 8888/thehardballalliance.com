@@ -1,9 +1,5 @@
 <div>
   <div *ngFor="let post of posts">
-    <app-news-post
-      [title]=post.title
-      [body]=post.body
-      [timestamp]=post.publishDate>
-    </app-news-post>
+    <app-news-post [postObject]=post></app-news-post>
   </div>
 </div> <!-- Posts -->
