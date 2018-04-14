@@ -1,21 +1,19 @@
-<div class="container">
-  <div class="row">
-    <div class="col">
-      <h1 class="title">The Hardball Alliance</h1>
-      <h4>a National Adult Baseball Association League</h4>
-    </div>
+<div class="row">
+  <div class="col">
+    <h1 class="title">The Hardball Alliance</h1>
+    <h4>a National Adult Baseball Association League</h4>
   </div>
-  <div class="row justify-content-center">
-    <div class="col">
-      <div class="btn-group btn-group-justified">
-        <div class="btn-group" *ngFor="let button of buttons">
-          <button
-              type="button"
-              class="btn btn-sm btn-secondary"
-              (click)="clickNavButton(button.url)">
-              {{button.display}}
-          </button>
-        </div>
+</div>
+<div class="row justify-content-center">
+  <div class="col">
+    <div class="btn-group btn-group-justified">
+      <div class="btn-group" *ngFor="let button of buttons">
+        <button
+            type="button"
+            class="btn btn-sm btn-secondary"
+            (click)="clickNavButton(button.url)">
+            {{button.display}}
+        </button>
       </div>
     </div>
   </div>

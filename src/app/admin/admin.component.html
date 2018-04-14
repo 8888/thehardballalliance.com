@@ -1,89 +1,87 @@
-<div class="container">
-  <div class="row">
-    <div class="col">
-      <div>
-        <div class="alert" class="alert" [ngClass]="{'alert-warning': editingPostId !== -1}" role="alert">
-          <h4 *ngIf="editingPostId === -1; else edit">
-            {{editHeaders.new}}
-          </h4>
-          <ng-template #edit>
-            <p>{{editHeaders.edit}}</p>
-          </ng-template>
-        </div>
-        <form [formGroup]="newPostForm" (ngSubmit)="onSubmit()">
-          <div class="form-group">
-            <label class="center-block">Title:
-              <input class="form-control" formControlName="title">
-            </label>
-          </div> <!-- title -->
-          <div class="form-group">
-            <label class="center-block">Body:
-              <textarea class="form-control" formControlName="body"></textarea>
-            </label>
-          </div> <!-- body -->
-          <label>Publish Date</label>
-          <div class="form-row" formGroupName="publishDate">
-            <div class="col-2">
-              <label>Month:</label>
-              <input type="number" class="form-control" formControlName="month">
-            </div>
-            <div class="col-2">
-              <label>Day:</label>
-              <input type="number" class="form-control" formControlName="day">
-            </div>
-            <div class="col-2">
-              <label>Year:</label>
-              <input type="number" class="form-control" formControlName="year">
-            </div>
-            <div class="col-2">
-              <label>Hour:</label>
-              <input type="number" class="form-control" formControlName="hour">
-            </div>
-            <div class="col-2">
-              <label>Minutes:</label>
-              <input type="number" class="form-control" formControlName="minutes">
-            </div>
-          </div> <!-- publishDate -->
-          <button type="submit" [disabled]="!newPostForm.valid" class="btn btn-success">
-            Submit
-          </button>
-          <div *ngIf="message" class="alert" [ngClass]="{'alert-danger': messageIsError, 'alert-success': !messageIsError}" role="alert">
-            {{message}}
+<div class="row">
+  <div class="col">
+    <div>
+      <div class="alert" class="alert" [ngClass]="{'alert-warning': editingPostId !== -1}" role="alert">
+        <h4 *ngIf="editingPostId === -1; else edit">
+          {{editHeaders.new}}
+        </h4>
+        <ng-template #edit>
+          <p>{{editHeaders.edit}}</p>
+        </ng-template>
+      </div>
+      <form [formGroup]="newPostForm" (ngSubmit)="onSubmit()">
+        <div class="form-group">
+          <label class="center-block">Title:
+            <input class="form-control" formControlName="title">
+          </label>
+        </div> <!-- title -->
+        <div class="form-group">
+          <label class="center-block">Body:
+            <textarea class="form-control" formControlName="body"></textarea>
+          </label>
+        </div> <!-- body -->
+        <label>Publish Date</label>
+        <div class="form-row" formGroupName="publishDate">
+          <div class="col-2">
+            <label>Month:</label>
+            <input type="number" class="form-control" formControlName="month">
           </div>
-        </form>
-      </div> <!-- Form -->
-      <div>
+          <div class="col-2">
+            <label>Day:</label>
+            <input type="number" class="form-control" formControlName="day">
+          </div>
+          <div class="col-2">
+            <label>Year:</label>
+            <input type="number" class="form-control" formControlName="year">
+          </div>
+          <div class="col-2">
+            <label>Hour:</label>
+            <input type="number" class="form-control" formControlName="hour">
+          </div>
+          <div class="col-2">
+            <label>Minutes:</label>
+            <input type="number" class="form-control" formControlName="minutes">
+          </div>
+        </div> <!-- publishDate -->
+        <button type="submit" [disabled]="!newPostForm.valid" class="btn btn-success">
+          Submit
+        </button>
+        <div *ngIf="message" class="alert" [ngClass]="{'alert-danger': messageIsError, 'alert-success': !messageIsError}" role="alert">
+          {{message}}
+        </div>
+      </form>
+    </div> <!-- Form -->
+    <div>
+      <hr>
+      <button *ngIf="editingPostId !== -1" type="submit" class="btn btn-warning" (click)="onClickSwitchToNew()">
+        Switch to creating a new post
+      </button><br>
+      <label>Existing Posts</label>
+      <div *ngFor="let post of posts">
+        <div class="row">
+          <div class="col-2 align-self-center">
+            <div class="btn-group" role="group">
+              <button type="button" class="btn btn-success btn-xs" (click)="onClickEditPost(post)">&#x270E;</button>
+              <button type="button" class="btn btn-danger btn-xs" (click)="onClickDeletePost(post)">X</button>
+            </div>
+          </div>
+          <div class="col">
+            <app-news-post
+              [postObject]=post
+              [displayFull]=false>
+            </app-news-post>
+          </div>
+        </div>
         <hr>
-        <button *ngIf="editingPostId !== -1" type="submit" class="btn btn-warning" (click)="onClickSwitchToNew()">
-          Switch to creating a new post
-        </button><br>
-        <label>Existing Posts</label>
-        <div *ngFor="let post of posts">
-          <div class="row">
-            <div class="col-2 align-self-center">
-              <div class="btn-group" role="group">
-                <button type="button" class="btn btn-success btn-xs" (click)="onClickEditPost(post)">&#x270E;</button>
-                <button type="button" class="btn btn-danger btn-xs" (click)="onClickDeletePost(post)">X</button>
-              </div>
-            </div>
-            <div class="col">
-              <app-news-post
-                [postObject]=post
-                [displayFull]=false>
-              </app-news-post>
-            </div>
-          </div>
-          <hr>
-        </div>
-      </div> <!-- Existing posts -->
-    </div> <!-- Col 1 -->
-    <div class="col">
-      <label>Preview:</label>
-      <app-news-post
-        [title]=formTitle
-        [body]=formBody
-        [publishDate]=formPublishDate>
-      </app-news-post>
-    </div> <!-- Preview -->
-  </div>
+      </div>
+    </div> <!-- Existing posts -->
+  </div> <!-- Col 1 -->
+  <div class="col">
+    <label>Preview:</label>
+    <app-news-post
+      [title]=formTitle
+      [body]=formBody
+      [publishDate]=formPublishDate>
+    </app-news-post>
+  </div> <!-- Preview -->
 </div>
