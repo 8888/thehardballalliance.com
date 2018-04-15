@@ -168,6 +168,7 @@ export class AdminComponent implements OnInit {
                     result => {
                         // created successfully
                         this.setMessage('Post created successfully!', false);
+                        this.fetchPosts();
                     },
                     error => this.handleHttpError(error)
                 );
@@ -177,13 +178,12 @@ export class AdminComponent implements OnInit {
                     result => {
                         // updated successfully
                         this.setMessage('Post updated successfully!', false);
+                        this.fetchPosts();
                     },
                     error => this.handleHttpError(error)
                 );
             }
-            // clear the form and update the posts
             this.resetForm();
-            this.fetchPosts();
         }
     }
 
@@ -213,6 +213,7 @@ export class AdminComponent implements OnInit {
             result => {
                 // deleted successfully
                 this.setMessage('Post deleted successfully!', false);
+                this.fetchPosts();
             },
             error => this.handleHttpError(error)
         );
@@ -220,6 +221,5 @@ export class AdminComponent implements OnInit {
             // this post was in the editing box
             this.resetForm();
         }
-        this.fetchPosts();
     }
 }
